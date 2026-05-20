@@ -1,0 +1,35 @@
+@baseUrl = http://localhost:3000
+
+### ============== Paginate ==============
+
+### Paginate with _page (default 10 items per page)
+GET {{baseUrl}}/posts?_page=1
+
+### Paginate with _page and _limit
+GET {{baseUrl}}/posts?_page=2&_limit=2
+
+# Link:
+# <http://localhost:3000/posts?_page=1&_limit=2>; rel="first",
+# <http://localhost:3000/posts?_page=1&_limit=2>; rel="prev",
+# <http://localhost:3000/posts?_page=3&_limit=2>; rel="next",
+# <http://localhost:3000/posts?_page=6&_limit=2>; rel="last"
+
+# {
+#   first: "http://localhost:3000/posts?_page=1&_limit=2",
+#   prev:  "http://localhost:3000/posts?_page=1&_limit=2",
+#   next:  "http://localhost:3000/posts?_page=3&_limit=2",
+#   last:  "http://localhost:3000/posts?_page=6&_limit=2"
+# }
+
+# // === client code ===
+# const res = await fetch('/posts?_page=3&_limit=2')
+# const posts = await res.json()
+# const links = parseLinkHeader(res.headers.get('Link'))
+# // Without prev / next, disable the button
+# prevBtn.disabled = !links.prev
+# nextBtn.disabled = !links.next
+# // When client the button, then fetch specific url
+# prevBtn.onclick = () => fetch(links.prev)
+# nextBtn.onclick = () => fetch(links.next)
+# firstBtn.onclick = () => fetch(links.first)
+# lastBtn.onclick = () => fetch(links.last)

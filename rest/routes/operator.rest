@@ -1,0 +1,12 @@
+@baseUrl = http://localhost:3000
+
+### ============== Operators ==============
+
+### _gte / _lte: range filter (views between 100 and 200)
+GET {{baseUrl}}/posts?views_gte=100&views_lte=200
+
+### _ne: exclude a value (exclude post id=1)
+GET {{baseUrl}}/posts?id_ne=1
+
+### _like: RegExp filter (title contains "server")
+GET {{baseUrl}}/posts?title_like=server

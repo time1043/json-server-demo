@@ -1,0 +1,12 @@
+@baseUrl = http://localhost:3000
+
+### ============== Sort ==============
+
+### Sort posts by views (ascending by default)
+GET {{baseUrl}}/posts?_sort=views&_order=asc
+
+### Sort comments by votes (ascending by default)
+GET {{baseUrl}}/posts/1/comments?_sort=votes&_order=asc
+
+### Sort by multiple fields
+GET {{baseUrl}}/posts?_sort=author,views&_order=desc,asc

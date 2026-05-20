@@ -1,0 +1,12 @@
+@baseUrl = http://localhost:3000
+
+### ============== Slice ==============
+
+### Slice posts with _start and _end (items 0~4)
+GET {{baseUrl}}/posts?_start=0&_end=5
+
+### Slice nested resource with _start and _end
+GET {{baseUrl}}/posts/1/comments?_start=0&_end=2
+
+### Slice with _start and _limit
+GET {{baseUrl}}/posts/1/comments?_start=2&_limit=2

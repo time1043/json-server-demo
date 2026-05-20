@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:3000
+
+### ============== Filter ==============
+
+### Filter posts by title and author
+GET {{baseUrl}}/posts?title=json-server&author=typicode
+
+### Filter posts by multiple ids
+GET {{baseUrl}}/posts?id=1&id=2
+
+### Filter comments by nested property (author.name)
+### Note: if the field doesn't exist in db, the filter is skipped and all records are returned
+GET {{baseUrl}}/comments?author.name=typicode

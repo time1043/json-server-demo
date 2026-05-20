@@ -1,0 +1,7 @@
+@baseUrl = http://localhost:3000
+
+### ============== Homepage ==============
+
+### Returns default index page or serves ./public/index.html
+# mkdir public && echo 'hello world' > public/index.html
+GET {{baseUrl}}/

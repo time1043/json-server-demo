@@ -1,0 +1,9 @@
+@baseUrl = http://localhost:3000
+
+### ============== Full-text search ==============
+
+### Search posts by keyword
+GET {{baseUrl}}/posts?q=server
+
+### Search comments by keyword
+GET {{baseUrl}}/comments?q=post

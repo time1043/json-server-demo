@@ -1,5 +1,181 @@
 {
-  "posts": [{ "id": 1, "title": "json-server", "author": "typicode" }],
-  "comments": [{ "id": 1, "body": "some comment", "postId": 1 }],
-  "profile": { "name": "typicode" }
+  "posts": [
+    {
+      "id": 1,
+      "title": "json-server",
+      "author": "typicode",
+      "views": 100
+    },
+    {
+      "id": 2,
+      "title": "json-server tips",
+      "author": "typicode",
+      "views": 200
+    },
+    {
+      "id": 3,
+      "title": "restful api design",
+      "author": "oswin",
+      "views": 150
+    },
+    {
+      "id": 4,
+      "title": "node.js intro",
+      "author": "alice",
+      "views": 50
+    },
+    {
+      "id": 5,
+      "title": "express guide",
+      "author": "typicode",
+      "views": 80
+    },
+    {
+      "id": 6,
+      "title": "cors explained",
+      "author": "oswin",
+      "views": 120
+    },
+    {
+      "id": 7,
+      "title": "http methods",
+      "author": "alice",
+      "views": 300
+    },
+    {
+      "id": 8,
+      "title": "status codes",
+      "author": "typicode",
+      "views": 45
+    },
+    {
+      "id": 9,
+      "title": "middleware basics",
+      "author": "oswin",
+      "views": 90
+    },
+    {
+      "id": 10,
+      "title": "routing patterns",
+      "author": "alice",
+      "views": 250
+    },
+    {
+      "id": 11,
+      "title": "error handling",
+      "author": "typicode",
+      "views": 180
+    },
+    {
+      "id": 12,
+      "title": "api versioning",
+      "author": "oswin",
+      "views": 60
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "great post!",
+      "postId": 1,
+      "votes": 5,
+      "author": {
+        "name": "typicode",
+        "email": "typicode@example.com"
+      }
+    },
+    {
+      "id": 2,
+      "body": "thanks for sharing",
+      "postId": 1,
+      "votes": 3,
+      "author": {
+        "name": "oswin",
+        "email": "oswin@example.com"
+      }
+    },
+    {
+      "id": 3,
+      "body": "very helpful",
+      "postId": 2,
+      "votes": 8,
+      "author": {
+        "name": "typicode",
+        "email": "typicode@example.com"
+      }
+    },
+    {
+      "id": 4,
+      "body": "nice work",
+      "postId": 3,
+      "votes": 2,
+      "author": {
+        "name": "alice",
+        "email": "alice@example.com"
+      }
+    },
+    {
+      "id": 5,
+      "body": "well explained",
+      "postId": 2,
+      "votes": 12,
+      "author": {
+        "name": "oswin",
+        "email": "oswin@example.com"
+      }
+    },
+    {
+      "id": 6,
+      "body": "learned a lot",
+      "postId": 1,
+      "votes": 6,
+      "author": {
+        "name": "alice",
+        "email": "alice@example.com"
+      }
+    },
+    {
+      "id": 7,
+      "body": "keep it up",
+      "postId": 2,
+      "votes": 1,
+      "author": {
+        "name": "typicode",
+        "email": "typicode@example.com"
+      }
+    },
+    {
+      "id": 8,
+      "body": "bookmarking this",
+      "postId": 3,
+      "votes": 9,
+      "author": {
+        "name": "oswin",
+        "email": "oswin@example.com"
+      }
+    },
+    {
+      "id": 9,
+      "body": "exactly what I needed",
+      "postId": 1,
+      "votes": 4,
+      "author": {
+        "name": "alice",
+        "email": "alice@example.com"
+      }
+    },
+    {
+      "id": 10,
+      "body": "thanks a bunch",
+      "postId": 2,
+      "votes": 7,
+      "author": {
+        "name": "typicode",
+        "email": "typicode@example.com"
+      }
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
 }

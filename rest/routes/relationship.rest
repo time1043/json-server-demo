@@ -1,0 +1,27 @@
+@baseUrl = http://localhost:3000
+
+### ============== Relationships ==============
+
+### _embed: include children resources
+GET {{baseUrl}}/posts?_embed=comments
+
+### _embed: include children for a single post
+GET {{baseUrl}}/posts/1?_embed=comments
+
+### _expand: include parent resource
+GET {{baseUrl}}/comments?_expand=post
+
+### _expand: include parent for a single comment
+GET {{baseUrl}}/comments/1?_expand=post
+
+### Nested resources: get comments of a post
+GET {{baseUrl}}/posts/1/comments
+
+### Nested resources: create a comment under a post
+POST {{baseUrl}}/posts/1/comments
+Content-Type: application/json
+
+{
+  "body": "new comment via nested route",
+  "author": { "name": "oswin", "email": "oswin@example.com" }
+}
