@@ -1,0 +1,11 @@
+@baseUrl = http://localhost:3000
+
+### ============== /posts ==============
+
+### Get all posts
+GET {{baseUrl}}/posts
+
+### ============== /posts/:id ==============
+
+### Get a specific post by id
+GET {{baseUrl}}/posts/1
