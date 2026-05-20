@@ -19,7 +19,6 @@ const dataService = createDataService();
 
 // App state
 const appState = {
-  posts: [],
   comments: [],
   searchQuery: "",
   sortField: "id",
@@ -44,22 +43,18 @@ async function init() {
   Toast.init();
   ConfirmDialog.init();
 
-  // Load data
+  // Load comments (for displaying counts on post cards)
   try {
-    [appState.posts, appState.comments] = await Promise.all([
-      dataService.posts.getAll(),
-      dataService.comments.getAll(),
-    ]);
+    appState.comments = await dataService.comments.getAll();
   } catch (err) {
-    Toast.show("Failed to load data", "error");
-    return;
+    Toast.show("Failed to load comments", "error");
   }
 
   // Init modules
   initPosts(dataService, appState);
   initComments(dataService, appState, renderPosts);
 
-  // Render initial posts
+  // Render initial posts (fetched from API)
   renderPosts();
 
   // Wire up event listeners
@@ -79,7 +74,6 @@ function wireUpEvents() {
   searchInput.addEventListener(
     "input",
     debounce((e) => {
-      appState.currentPage = 1; // Reset to first page on search
       handleSearch(e.target.value);
     }, 300),
   );
@@ -117,8 +111,7 @@ function wireUpEvents() {
     const postId = Number(action.dataset.id);
 
     if (actionType === "edit") {
-      const post = appState.posts.find((p) => p.id === postId);
-      if (post) openPostForm(post);
+      dataService.posts.getById(postId).then((post) => openPostForm(post));
     } else if (actionType === "delete") {
       handlePostDelete(postId);
     } else if (actionType === "comments") {

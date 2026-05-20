@@ -1,4 +1,4 @@
-// Posts module - rendering, forms, search, sort
+// Posts module - server-side pagination, filter, sort, search
 
 import {
   escapeHTML,
@@ -17,41 +17,6 @@ let appState;
 export function initPosts(ds, state) {
   dataService = ds;
   appState = state;
-}
-
-// Get filtered and sorted posts
-function getFilteredPosts() {
-  let filtered = [...appState.posts];
-
-  // Filter by search
-  if (appState.searchQuery) {
-    const q = appState.searchQuery.toLowerCase();
-    filtered = filtered.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) || p.author.toLowerCase().includes(q),
-    );
-  }
-
-  // Sort
-  filtered.sort((a, b) => {
-    let valA = a[appState.sortField];
-    let valB = b[appState.sortField];
-    if (typeof valA === "string") {
-      valA = valA.toLowerCase();
-      valB = valB.toLowerCase();
-    }
-    if (valA < valB) return appState.sortDirection === "asc" ? -1 : 1;
-    if (valA > valB) return appState.sortDirection === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  return filtered;
-}
-
-// Get paginated slice of filtered posts
-function getPaginatedPosts(filtered) {
-  const start = (appState.currentPage - 1) * appState.perPage;
-  return filtered.slice(start, start + appState.perPage);
 }
 
 // Render pagination controls
@@ -147,57 +112,60 @@ function renderPostCard(post) {
   `;
 }
 
-// Render all posts
-export function renderPosts() {
+// Render all posts (async - fetches from API)
+export async function renderPosts() {
   const container = document.getElementById("posts");
   const emptyState = document.getElementById("empty-state");
   const clearSearchBtn = document.getElementById("btn-clear-search");
   const createFirstBtn = document.getElementById("btn-create-first");
   const postCount = document.getElementById("post-count");
 
-  const filtered = getFilteredPosts();
-  const paginated = getPaginatedPosts(filtered);
-  const totalPages = Math.ceil(filtered.length / appState.perPage);
+  try {
+    const { data: posts, total } = await dataService.posts.getAll({
+      page: appState.currentPage,
+      limit: appState.perPage,
+      sort: appState.sortField,
+      order: appState.sortDirection,
+      q: appState.searchQuery || undefined,
+    });
 
-  // Reset to page 1 if current page exceeds total pages
-  if (appState.currentPage > totalPages && totalPages > 0) {
-    appState.currentPage = totalPages;
-    return renderPosts();
-  }
+    const totalPages = Math.ceil(total / appState.perPage);
 
-  // Update count
-  const total = appState.posts.length;
-  const shown = filtered.length;
-  const start =
-    filtered.length === 0
-      ? 0
-      : (appState.currentPage - 1) * appState.perPage + 1;
-  const end = Math.min(
-    appState.currentPage * appState.perPage,
-    filtered.length,
-  );
-
-  postCount.textContent = appState.searchQuery
-    ? `Showing ${start}-${end} of ${shown} posts (filtered from ${total})`
-    : `Showing ${start}-${end} of ${total} posts`;
-
-  if (filtered.length === 0) {
-    container.innerHTML = "";
-    document.getElementById("pagination").innerHTML = "";
-    emptyState.classList.remove("hidden");
-    if (appState.searchQuery) {
-      clearSearchBtn.classList.remove("hidden");
-      createFirstBtn.classList.add("hidden");
-    } else {
-      clearSearchBtn.classList.add("hidden");
-      createFirstBtn.classList.remove("hidden");
+    // Reset to page 1 if current page exceeds total pages
+    if (appState.currentPage > totalPages && totalPages > 0) {
+      appState.currentPage = totalPages;
+      return renderPosts();
     }
-    return;
-  }
 
-  emptyState.classList.add("hidden");
-  container.innerHTML = paginated.map(renderPostCard).join("");
-  renderPagination(filtered.length);
+    // Update count
+    const start =
+      total === 0 ? 0 : (appState.currentPage - 1) * appState.perPage + 1;
+    const end = Math.min(appState.currentPage * appState.perPage, total);
+
+    postCount.textContent = appState.searchQuery
+      ? `Showing ${start}-${end} of ${total} posts`
+      : `Showing ${start}-${end} of ${total} posts`;
+
+    if (total === 0) {
+      container.innerHTML = "";
+      document.getElementById("pagination").innerHTML = "";
+      emptyState.classList.remove("hidden");
+      if (appState.searchQuery) {
+        clearSearchBtn.classList.remove("hidden");
+        createFirstBtn.classList.add("hidden");
+      } else {
+        clearSearchBtn.classList.add("hidden");
+        createFirstBtn.classList.remove("hidden");
+      }
+      return;
+    }
+
+    emptyState.classList.add("hidden");
+    container.innerHTML = posts.map(renderPostCard).join("");
+    renderPagination(total);
+  } catch (err) {
+    Toast.show("Failed to load posts", "error");
+  }
 }
 
 // Open post form (create or edit)
@@ -286,13 +254,10 @@ export function openPostForm(post = null) {
 
     try {
       if (isEdit) {
-        const updated = await dataService.posts.update(post.id, data);
-        const index = appState.posts.findIndex((p) => p.id === post.id);
-        appState.posts[index] = updated;
+        await dataService.posts.update(post.id, data);
         Toast.show("Post updated successfully", "success");
       } else {
-        const created = await dataService.posts.create(data);
-        appState.posts.push(created);
+        await dataService.posts.create(data);
         Toast.show("Post created successfully", "success");
       }
       Modal.close();
@@ -305,19 +270,17 @@ export function openPostForm(post = null) {
 
 // Handle post delete
 export async function handlePostDelete(postId) {
-  const post = appState.posts.find((p) => p.id === postId);
-  if (!post) return;
-
-  const { ConfirmDialog } = await import("./ui.js");
-  const confirmed = await ConfirmDialog.show(
-    `Delete post "${post.title}"? This cannot be undone.`,
-  );
-  if (!confirmed) return;
-
+  // Need to fetch the post to get its title for the confirm message
   try {
+    const post = await dataService.posts.getById(postId);
+    const { ConfirmDialog } = await import("./ui.js");
+    const confirmed = await ConfirmDialog.show(
+      `Delete post "${post.title}"? This cannot be undone.`,
+    );
+    if (!confirmed) return;
+
     await dataService.posts.delete(postId);
-    appState.posts = appState.posts.filter((p) => p.id !== postId);
-    // Also remove related comments
+    // Also remove related comments from local cache
     appState.comments = appState.comments.filter((c) => c.postId !== postId);
     renderPosts();
     Toast.show("Post deleted", "success");
@@ -329,6 +292,7 @@ export async function handlePostDelete(postId) {
 // Handle search
 export function handleSearch(query) {
   appState.searchQuery = query;
+  appState.currentPage = 1;
   renderPosts();
 }
 
@@ -336,7 +300,7 @@ export function handleSearch(query) {
 export function handleSort(field, direction) {
   appState.sortField = field;
   appState.sortDirection = direction;
-  appState.currentPage = 1; // Reset to first page on sort change
+  appState.currentPage = 1;
   renderPosts();
 }
 
@@ -344,7 +308,6 @@ export function handleSort(field, direction) {
 export function handlePageChange(page) {
   appState.currentPage = page;
   renderPosts();
-  // Scroll to top of posts
   document
     .getElementById("posts")
     .scrollIntoView({ behavior: "smooth", block: "start" });
